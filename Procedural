@@ -1,0 +1,231 @@
+import pyttsx3
+import speech_recognition as sr
+import datetime
+import wikipedia
+import webbrowser
+import os
+import smtplib
+import pyowm
+import youtube_dl
+import requests
+from bs4 import BeautifulSoup
+from googlesearch import search
+
+engine = pyttsx3.init()
+rate = engine.getProperty("rate")
+engine.setProperty("rate",150)
+# engine.say("hello how are you")
+# engine.runAndWait()
+
+#FOR ASSISTANT TO SPEAK
+def speak(audio):
+    engine.say(audio)
+    engine.runAndWait()
+
+#FOR WISHING WRT TO TIME
+def wishMe():
+    hour = int(datetime.datetime.now().hour)
+    if hour>=0 and hour<12:
+        speak("Good Morning!")
+
+    elif hour>=12 and hour<18:
+        speak("Good Afternoon!")
+
+    else:
+        speak("Good Evening!")
+
+    speak("I am Jarvis Sir. Please tell me how may I help you")
+
+
+#FOR TAKING USER INPUT THROUGH VOICE
+def takeCommand():
+    #It takes microphone input from the user and returns string output
+
+    r = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening...")
+        # r.pause_threshold = 1
+        audio = r.listen(source)
+
+    try:
+        print("Recognizing...")
+        query = r.recognize_google(audio, language='en-in')
+        print(f"User said: {query}\n")
+
+    except Exception as e:
+        # print(e)
+        print("Say that again please...")
+        return "None"
+    return query
+
+#FOR SENDING EMAIL
+def sendEmail(to, content):
+    with open("C:\\Users\\CC\\.PyCharmCE2018.2\\config\\scratches\\password.txt","r") as f:
+        password=f.read()
+        f.close()
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.ehlo()
+    server.starttls()
+    server.login('wajahatahmed049@gmail.com',password)
+    server.sendmail('wajahatahmed049@gmail.com', to, content)
+    server.close()
+
+#FOR
+def weather(city):
+    owm = pyowm.OWM(API_key='ab0d5e80e8dafb2cb81fa9e82431c1fa')
+    obs = owm.weather_at_place(city)
+    w = obs.get_weather()
+    status = w.get_detailed_status()
+    temp = w.get_temperature(unit='celsius')
+    temperature= int(temp["temp"])
+    max_temperature= int(temp["temp_max"])
+    min_temperature = int(temp["temp_min"])
+    return(status,temperature,max_temperature,min_temperature)
+
+def google_news():
+    news_url = "https://news.google.com.pk/news/rss"
+    page = requests.get(news_url)
+    soup = BeautifulSoup(page.content, "html.parser")
+    news = soup.find_all("title")
+    no_news = 0
+    for new in news:
+        print(new)
+        speak(new)
+        no_news += 1
+        if no_news == 5:
+            break
+
+def jokes():
+    jokes_url="https://icanhazdadjoke.com/"
+    page=requests.get(jokes_url)
+    soup=BeautifulSoup(page.content,"html.parser")
+    jokes=soup.find("p",{"class":"subtitle"})
+    speak(jokes)
+    print(jokes)
+
+
+def google_search():
+    speak("what do you want to search?")
+    print("what do you want to search?")
+    result=takeCommand()
+    for results in search(result, tld="co.in", num=10, stop=10, pause=2):
+        print(results)
+
+def song(name):
+    url = "https://www.youtube.com/results?search_query=" + name
+    page = requests.get(url)
+    soup = BeautifulSoup(page.content, "html.parser")
+    songs = soup.find_all(attrs={'class': 'yt-uix-tile-link'})
+
+    for song in songs:
+        song_name = song.get("href")[9::]+"mp4"
+        url_song = "https://www.youtube.com" + song.get("href")
+        break
+
+    ydl = youtube_dl.YoutubeDL({'outtmpl': '%(id)s%(ext)s'})
+
+    with ydl:
+        resulting = ydl.extract_info(
+            url_song,
+            download=True  # We just want to extract the info
+        )
+
+    print(song_name)
+
+    os.startfile(os.path.abspath(song_name))
+
+if __name__ == "__main__":
+    wishMe()
+    while True:
+    # if 1:
+        query = takeCommand().lower()
+
+        # Logic for executing tasks based on query
+        if 'wikipedia' in query:
+            speak('Searching Wikipedia...')
+            query = query.replace("wikipedia", "")
+            results = wikipedia.summary(query, sentences=2)
+            speak("According to Wikipedia")
+            print(results)
+            speak(results)
+
+        elif 'open youtube' in query:
+            webbrowser.open("https://www.youtube.com")
+
+        elif 'open google' in query:
+            webbrowser.open("https://www.google.com")
+
+        elif 'open stackoverflow' in query:
+            webbrowser.open("https://www.stackoverflow.com")
+
+        elif "open website" in query:
+            speak("please tell the website name")
+            web=takeCommand().lower()
+            link="htpps://www."+web+".com"
+            webbrowser.open(link)
+
+
+        elif 'play music' in query:
+            music_dir = 'D:\\Non Critical\\songs\\Favorite Songs2'
+            songs = os.listdir(music_dir)
+            print(songs)
+            os.startfile(os.path.join(music_dir, songs[0]))
+
+        elif 'the time' in query:
+            strTime = datetime.datetime.now().strftime("%H:%M:%S")
+            speak(f"Sir, the time is {strTime}")
+
+        elif 'open code' in query:
+            codePath = "C:\\Users\\Haris\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe"
+            os.startfile(codePath)
+
+        elif "open torrent" in query:
+            os.startfile(os.path.abspath("torrent"))
+
+        elif 'email to harry' in query:
+            try:
+                speak("What should I say?")
+                content = takeCommand()
+                to = "tashanamshahbaz72@gmail.com"
+                sendEmail(to, content)
+                speak("Email has been sent!")
+            except Exception as e:
+                print(e)
+                speak("Sorry I am not able to send this email")
+
+
+        elif "weather" in query:
+            try:
+                speak("please tell the city name")
+                city = takeCommand()
+            except:
+                speak("please tell the city name")
+                city = takeCommand()
+
+            weather_now = weather(city)
+            speak(f"the status is {weather_now[0]}  the temp is {weather_now[1]}  the maximum temperature is {weather_now[2]}  the minimum temperature is {weather_now[3]}")
+            print(f"the status is {weather_now[0]}  the temp is {weather_now[1]}  the maximum temperature is {weather_now[2]}  the minimum temperature is {weather_now[3]}")
+
+
+
+        elif "news" in query:
+            google_news()
+
+
+        elif "joke" in query:
+            jokes()
+
+
+        elif "google search" in query:
+            google_search()
+
+
+        elif "open song" in query:
+            speak("please tell the name of song")
+            name=takeCommand()
+            song(name)
+
+        elif "shut down" in query:
+            speak("ok bye take care")
+            break
