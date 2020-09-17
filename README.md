@@ -44,6 +44,12 @@ Our application is programmed in a such a way that it will speak and ask the use
 We have formed different classes containing different attributes and methods. These classes and methods perform different functions. Our main class has a while loop which contains multiple if elif statements which will continuously ask the user for command and the it will call the method of a specific class and execute it. The program will run until the user say “terminate” or “shut down”.
  Your input should contain the keywords like ,  “wikipedia” , “website” ,  “time” ,  “email” ,  “weather" , "news" ,  "joke" ,  "google search" ,  "song" ,  "music" ,  "open application" ,  "background".
  
+ Go to folder VDA and then run the main file which is Desktop_Assistant.py
+ 
+ NOTE: /
+ In file password.txt there is a list write your email as first element and password as second element both in string . You can further add emails in emailcontact.txt.
+ 
+ 
  
 
 
