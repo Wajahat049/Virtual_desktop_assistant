@@ -4,7 +4,7 @@ It is controlled by your voice and you can enable it to perform different tasks 
 
 ## Installation
 Should have the following modules and libraries installed to run this program \
-➢ **Pyttsx3**   (text-to-speech conversion library) \
+➢ **Pyttsx3**(version 2.10.0)   (text-to-speech conversion library) \
 ➢ **os**    (module to interact with operating system) \
 ➢ **SpeechRecognition**   (Library for performing speech recognition, with support for several engines and APIs) \
 ➢ **bs4**   (library for pulling data out of HTML and XML files) \
